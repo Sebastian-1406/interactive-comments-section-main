@@ -121,11 +121,14 @@ contenedor.addEventListener("click", evt => {
             }
             else if(evt.target.value === "eliminar"){
                 if(publicacion.parentElement.parentElement.children.length == 1){
+                    evt.target.parentElement.parentElement.outerHTML = ""
                     publicacion.parentElement.parentElement.outerHTML = ""
-                }
-                publicacion.parentElement.outerHTML = ""
-                nodoELement.outerHTML = ""
-                body.classList.remove("overflow")
+                    body.classList.remove("overflow")
+                }else {
+                    publicacion.parentElement.outerHTML = ""
+                    evt.target.parentElement.parentElement.outerHTML = ""
+                    body.classList.remove("overflow")
+                }                  
             }
         })
     }
