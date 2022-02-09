@@ -36,6 +36,7 @@ const Comments = ({png, username, content, score, createdAt}) => {
             <img src=${png} class="img-usuario"/> 
             <p class="usuario">${username}</p>
             <p>${createdAt}</p>
+            ${username === "juliusomo" ? `<p class="you__publicacion">You</p>` : ""}
         </div>
         <p>${content}</p>
         <div class="publicacion__score">
@@ -64,18 +65,24 @@ const Comments = ({png, username, content, score, createdAt}) => {
 
 contenedor.addEventListener("click", evt => {
     
-    if(evt.target.parentElement.classList.contains("publicacion__reply") && !evt.target.parentElement.parentElement.parentElement.classList.contains("caja__comentarios") && evt.target.classList.contains("btn__reply") || evt.target.parentElement.parentElement.classList.contains("btn__reply") || evt.target.tagName === "FONT"){
+    if(evt.target.parentElement.classList.contains("publicacion__reply") && !evt.target.parentElement.parentElement.parentElement.classList.contains("caja__comentarios") && evt.target.classList.contains("btn__reply")){
         // contenedor Publicacion 
         let nodo = evt.target.parentElement.parentNode
+        
         let seccion = nodo.parentNode
         
-        if(info === true){
+        if(info){
             info = false
             seccion.innerHTML += formComments("send")
         }else {
             let formulario = document.querySelector(".form__comentario")
-            formulario.outerHTML = ""
-            info = true
+            if(formulario){
+                formulario.outerHTML = " "
+                info = true
+            }else {
+                seccion.innerHTML += formComments("send")
+            }
+            
         }
         
         
