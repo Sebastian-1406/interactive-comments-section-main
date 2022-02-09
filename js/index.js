@@ -7,17 +7,14 @@ let info = true
 const listOfCurrentUser = () => {
     cargarPublicaciones(data.comments)
 }
-// <------
 const cargarPublicaciones = (data) => {
     data.forEach(({user, content, createdAt, replies, score}) => {
         const {username, image} = user
         const {png} = image
         contenedor.innerHTML += `
             <section>
-
                 ${Comments({png, username, content, score, createdAt})}    
                 ${replies.length > 0 ? `<div class="caja__comentarios">${cargarComentarios({replies})}</div>` : ""}                                
-
             </section>
         `
     })
@@ -61,16 +58,14 @@ const Comments = ({png, username, content, score, createdAt}) => {
         </div>
     </div>`
 }
-// ----->
-
 contenedor.addEventListener("click", evt => {
-    
-    if(evt.target.parentElement.classList.contains("publicacion__reply") && !evt.target.parentElement.parentElement.parentElement.classList.contains("caja__comentarios") && evt.target.classList.contains("btn__reply")){
-        // contenedor Publicacion 
+    let nodoELement = evt.target.parentElement.parentElement
+
+    if(evt.target.parentElement.classList.contains("publicacion__reply") && !nodoELement.parentElement.classList.contains("caja__comentarios") && evt.target.classList.contains("btn__reply")){
+
         let nodo = evt.target.parentElement.parentNode
         
         let seccion = nodo.parentNode
-        
         if(info){
             info = false
             seccion.innerHTML += formComments("send")
@@ -82,15 +77,11 @@ contenedor.addEventListener("click", evt => {
             }else {
                 seccion.innerHTML += formComments("send")
             }
-            
         }
-        
-        
-
     }
-    else if(evt.target.parentElement.parentElement.parentElement.classList.contains("caja__comentarios") && evt.target.parentElement.classList.contains("publicacion__reply") && evt.target.classList.contains("btn__reply")){
-        let nodo = evt.target.parentElement.parentElement
-        let nodoHTMl = evt.target.parentElement.parentElement.outerHTML
+    else if(evt.target.parentElement.classList.contains("publicacion__reply") && evt.target.classList.contains("btn__reply")){
+        let nodo = nodoELement
+        let nodoHTMl = nodoELement.outerHTML
         save = nodoHTMl
         if(info === true){
             info = false
@@ -99,17 +90,12 @@ contenedor.addEventListener("click", evt => {
                 ${save}
                 ${formComments("Send")}
             </section>`
-        }else {
-            let formulario = document.querySelector(".form__comentario")
-            formulario.outerHTML = ""
-            info = true
         }
-        
-
+  
     }
     else if(evt.target.parentElement.classList.contains("publicacion__reply") && evt.target.classList.contains("btn__delete")){
+
         let publicacion = evt.target.parentElement
-        console.log(publicacion);
         let body = document.querySelector("body")
         let seccion = document.createElement("section")
         body.classList.add("overflow")
@@ -121,16 +107,16 @@ contenedor.addEventListener("click", evt => {
         alerta.style.top = `${altura / 2}px`
 
         seccion.innerHTML = `
-        <h2>Delete comment</h2>
-        <p>Are you sure you want to delete this comment? This will remove the comment and can't be undone.</p>
-        <div class="alert__confirmar">
-            <button value="cancelar">No, Cancel</button>
-            <button value="eliminar">Yes, Delete</button>
-        </div>
+            <h2>Delete comment</h2>
+            <p>Are you sure you want to delete this comment? This will remove the comment and can't be undone.</p>
+            <div class="alert__confirmar">
+                <button value="cancelar">No, Cancel</button>
+                <button value="eliminar">Yes, Delete</button>
+            </div>
         `
         alerta.addEventListener("click", (evt) => {
             if(evt.target.value === "cancelar"){
-                evt.target.parentElement.parentElement.outerHTML = ""
+                nodoELement.outerHTML = ""
                 body.classList.remove("overflow")
             }
             else if(evt.target.value === "eliminar"){
@@ -138,14 +124,13 @@ contenedor.addEventListener("click", evt => {
                     publicacion.parentElement.parentElement.outerHTML = ""
                 }
                 publicacion.parentElement.outerHTML = ""
-                evt.target.parentElement.parentElement.outerHTML = ""
+                nodoELement.outerHTML = ""
                 body.classList.remove("overflow")
             }
         })
     }
     else if((evt.target.parentElement.classList.contains("publicacion__reply") && evt.target.classList.contains("btn__edit"))){
         let content = evt.target.parentElement.parentElement.children[1]
-
         let nodo = evt.target.parentElement.parentElement
         save = nodo.outerHTML
         nodo.classList.remove("publicacion")
@@ -154,25 +139,24 @@ contenedor.addEventListener("click", evt => {
         nodo.innerHTML = ""
         nodo.innerHTML += `${save}`
 
-        if(info === true){
-            info = false
-            nodo.innerHTML += `
-            <form class="form__edit">
-                <textarea  placeholder="Add a comment">${content.textContent}</textarea>
-                <img src="./images/avatars/image-juliusomo.png" alt="image/juliusomo" class="img-usuario"/> 
-                <input type="submit" value="SEND" />
-            </form>
-        `  
-        }else {
-            let formulario = document.querySelector(".form__edit")
-            formulario.outerHTML = ""
-            info = true
 
+        if(info === true){
+            nodo.innerHTML += formComments("send", "form__edit", content.textContent) 
+            info = false
+        }else {    
+            let formulario = document.querySelector(".form__edit")
+            if(formulario){
+                formulario.outerHTML = ""
+                info = true            
+            }else {
+                nodo.innerHTML += formComments("send", "form__edit", content.textContent) 
+                info = false
+            }
         }
         
         save = parseInt(nodo.children[0].children[2].outerText)
     }
-    
+    else
 
     if (evt.target.tagName == "IMG"){
         let likeValue = evt.target.parentElement.children[1]
@@ -194,7 +178,6 @@ contenedor.addEventListener("click", evt => {
         }
     }
 })
-
 const comentar = (form ,nodo , comentario) => {
     const user = {
         png : "./images/avatars/image-juliusomo.png", 
@@ -228,10 +211,10 @@ const comentar = (form ,nodo , comentario) => {
 
     
 }
-const formComments = (button) => {
+const formComments = (button, clase, contend) => {
     return (
-        `<form class="form__comentario">
-            <textarea  placeholder="Add a comment"></textarea>
+        `<form class=${clase ? clase : "form__comentario"}>
+            <textarea  placeholder="Add a comment">${contend ? contend : ""}</textarea>
             <img src="./images/avatars/image-juliusomo.png" alt="image/juliusomo" class="img-usuario"/> 
             <input type="submit" value=${button} />
         </form>`
@@ -243,6 +226,7 @@ contenedor.addEventListener("submit", evt => {
         let form = evt.target
         let input  = evt.target.children[0].value
         comentar(form ,evt.target.parentElement, input)
+        info = true
     }
     else if(evt.target.classList.contains("form__edit")){
         let form = evt.target
